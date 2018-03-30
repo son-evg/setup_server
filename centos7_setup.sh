@@ -54,15 +54,13 @@ fi" >>/etc/rc.d/rc.local
 
 echo "INSTALL EPEL-RELEASE"
 yum install epel-release -y
-yum install  iptables-services net-tools htop glances tuned chrony -y
+yum install  iptables-services net-tools htop glances tuned chrony wget -y
 yum groupinstall "Development Tools" -y
 
 echo "INSTALL Rsyslog"
 yum -y install rsyslog
 systemctl enable rsyslog.service
 systemctl start rsyslog.service
-
-
 
 echo "SET TIMEZONE"
 timedatectl set-timezone Asia/Ho_Chi_Minh
