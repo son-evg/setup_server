@@ -69,7 +69,11 @@ systemctl enable iptables chronyd crond tuned
 systemctl start chronyd
 chronyc tracking
 
+echo "Update kernel"
+yum update kernel -y
+
 echo "IF RUN TUNED ==> "
 echo "tuned-adm profile throughput-performance"
 echo "EDIT SELINUX"
 sed -i -e 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+
