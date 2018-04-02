@@ -1,0 +1,117 @@
+[mysqld]
+datadir=/var/lib/mysql
+socket=/var/lib/mysql/mysql.sock
+user=mysql
+symbolic-links=0
+
+server_id=1
+
+binlog_format=ROW
+
+#################### TUNNING ##########
+slow_query_log=1
+
+slow_query_log_file =/var/log/slow_mysql.log
+
+long_query_time=2
+
+connect_timeout=300
+
+skip_name_resolve
+
+innodb_flush_log_at_trx_commit=1
+
+sync_binlog=1
+
+innodb_file_per_table=1
+
+max_allowed_packet=1G
+
+open_files_limit=65535
+
+max_connect_errors=1000000
+
+innodb_buffer_pool_size=18G
+
+table_open_cache_instances=24
+
+read_buffer_size=2M
+
+read_rnd_buffer_size=2M
+
+join_buffer_size=1M
+
+sort_buffer_size=1M
+
+innodb_read_io_threads=64
+
+innodb_write_io_threads=64
+
+innodb_io_capacity=520
+
+innodb_buffer_pool_instances=18
+
+innodb_buffer_pool_dump_at_shutdown=1
+
+innodb_buffer_pool_load_at_startup=1
+
+thread_cache_size=512
+
+innodb_log_buffer_size=64M
+
+innodb_log_file_size=500M
+
+innodb_flush_method=O_DIRECT
+
+innodb_thread_concurrency=0
+
+wait_timeout=1200
+
+interactive_timeout=1200
+
+max_connections=7200
+
+innodb_fast_shutdown=0
+
+table_open_cache=3000
+
+tmp_table_size=64M
+
+max_heap_table_size=64M
+
+net_read_timeout=300
+
+net_write_timeout=300
+
+log_bin_trust_function_creators = 1
+
+event_scheduler = 1
+
+query_cache_type=1
+
+query_cache_size=64M
+
+query_cache_limit=8K
+
+########### Enable binlog #########
+log-bin = /var/lib/mysql/mysql-bin
+relay-log = /var/lib/mysql/relay-bin
+expire_logs_days=15
+max_binlog_size=300M
+
+[client]
+socket=/var/lib/mysql/mysql.sock
+
+
+[mysqld_safe]
+log_error=/var/log/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
+
+# GRANT REPLICATION SLAVE ON *.* TO 'repl'@'%' IDENTIFIED BY 'slavepass';
+# flush privileges;
+# SHOW MASTER STATUS;
+
+# CHANGE MASTER TO MASTER_HOST='192.168.142.230',MASTER_USER='repl', MASTER_PASSWORD='slavepass', MASTER_LOG_FILE='mysql-bin.000002', MASTER_LOG_POS=  186;
+# start slave;
+# flush privileges;
+# show slave status\G
