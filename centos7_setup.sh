@@ -76,4 +76,5 @@ echo "IF RUN TUNED ==> "
 echo "tuned-adm profile throughput-performance"
 echo "EDIT SELINUX"
 sed -i -e 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+sed -i -e 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
 
