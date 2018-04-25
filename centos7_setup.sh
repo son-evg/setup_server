@@ -36,12 +36,11 @@ echo "IPV6INIT=no" >>/etc/modprobe.d/disabled.conf
 
 echo "EDIT LIMITS.CONF"
 echo "* hard core 0" >>/etc/security/limits.conf
-echo "* soft nofile 32768" >>/etc/security/limits.conf
-echo "* soft nproc 65536" >>/etc/security/limits.conf
-echo "* hard nofile 1048576" >>/etc/security/limits.conf
-echo "* hard nproc unlimited" >>/etc/security/limits.conf
-echo "* hard memlock unlimited" >>/etc/security/limits.conf
-echo "* soft memlock unlimited" >>/etc/security/limits.conf
+echo "root soft nofile 32768" >>/etc/security/limits.conf
+echo "root soft nproc 65536" >>/etc/security/limits.conf
+echo "root hard nofile 1048576" >>/etc/security/limits.conf
+echo "root hard nproc unlimited" >>/etc/security/limits.conf
+echo "root - memlock unlimited" >>/etc/security/limits.conf
 
 echo "ENABLE HUGEPAGE"
 echo "if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
