@@ -1,8 +1,8 @@
 id="1"
 HOSTNAME=$(hostname)
-server1="kafka01"
-server2="kafka02"
-server3="kafka03"
+server1="node1"
+server2="node2"
+server3="node3"
 yum localinstall -y jdk-8u144-linux-x64.rpm
 echo "export JAVA_HOME=/usr/java/jdk1.8.0_144/" >> /etc/profile
 source /etc/profile
@@ -32,36 +32,35 @@ END
 echo $id > /data/kafka/zookeeper/data/myid
 
 cat > "/opt/kafka/config/server.properties" <<END
+############################# Server Basics #############################
 broker.id=$id
-listeners=PLAINTEXT://$HOSTNAME:9092
-advertised.listeners=PLAINTEXT://$HOSTNAME:9092
+############################# Socket Server Settings #############################
+port=9092
+host.name=$HOSTNAME
+advertised.host.name=$HOSTNAME
+#advertised.port=9092
 num.network.threads=3
 num.io.threads=8
 socket.send.buffer.bytes=102400
 socket.receive.buffer.bytes=102400
 socket.request.max.bytes=104857600
-
+############################# Log Basics #############################
 log.dirs=/data/kafka/kafka/kafka-logs
-
 num.partitions=1
 num.recovery.threads.per.data.dir=1
-
-offsets.topic.replication.factor=1
-transaction.state.log.replication.factor=1
-transaction.state.log.min.isr=1
-
+############################# Log Flush Policy #############################
 #log.flush.interval.messages=10000
 #log.flush.interval.ms=1000
-
+############################# Log Retention Policy #############################
 log.retention.hours=168
 #log.retention.bytes=1073741824
 log.segment.bytes=1073741824
 log.retention.check.interval.ms=300000
-
-zookeeper.connect=$server1:2181,$server2:2181,$server3:2181
+log.cleaner.enable=false
+############################# Zookeeper #############################
+zookeeper.connect=node1:2181,node2:2181,node3:2181
 zookeeper.connection.timeout.ms=6000
-
-group.initial.rebalance.delay.ms=0
+#group.initial.rebalance.delay.ms=0
 END
 
 cat > "/lib/systemd/system/kafka.service" <<END
