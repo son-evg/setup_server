@@ -54,7 +54,7 @@ fi" >>/etc/rc.d/rc.local
 echo "INSTALL EPEL-RELEASE"
 yum install -y http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 yum clean all
-yum install ntp net-tools htop glances tuned wget -y
+yum install ntp net-tools htop glances tuned wget curl -y
 yum groupinstall "Development Tools" -y
 
 echo "INSTALL Rsyslog"
