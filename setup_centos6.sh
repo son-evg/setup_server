@@ -60,13 +60,13 @@ yum groupinstall "Development Tools" -y
 echo "INSTALL Rsyslog"
 yum -y install rsyslog
 service rsyslog start
-chkconfig add rsyslog
+chkconfig rsyslog on
 
 echo "SET TIMEZONE"
 rm -rf /etc/localtime
 ln -s /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime
 service ntpd start
-chkconfig add ntpd
+chkconfig ntpd on
 
 echo "Update kernel"
 yum update kernel -y
