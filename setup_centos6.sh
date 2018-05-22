@@ -9,7 +9,7 @@ echo "tty1" > /etc/securetty
 chmod 700 /root
 
 echo "DISABLE POSTFIX"
-chkconfig off postfix
+chkconfig postfix off
 
 
 echo "Deny All TCP Wrappers"
