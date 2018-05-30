@@ -11,7 +11,6 @@ chmod 700 /root
 echo "DISABLE POSTFIX"
 chkconfig postfix off
 
-
 echo "Deny All TCP Wrappers"
 echo "ALL:ALL" >> /etc/hosts.deny
 echo "sshd:ALL" >> /etc/hosts.allow
@@ -38,13 +37,9 @@ echo "root hard nproc unlimited" >>/etc/security/limits.conf
 echo "root - memlock unlimited" >>/etc/security/limits.conf
 
 echo "ENABLE HUGEPAGE"
-echo "if test -f /sys/kernel/mm/redhat_transparent_hugepage/defrag; then
-echo never > /sys/kernel/mm/redhat_transparent_hugepage/defrag
-fi" >> /etc/rc.d/rc.local
+echo "echo never > /sys/kernel/mm/redhat_transparent_hugepage/defrag" >> /etc/rc.d/rc.local
 
-echo "if test -f /sys/kernel/mm/redhat_transparent_hugepage/enabled; then
-echo never > /sys/kernel/mm/redhat_transparent_hugepage/enabled
-fi" >>/etc/rc.d/rc.local
+echo "echo never > /sys/kernel/mm/redhat_transparent_hugepage/enabled" >>/etc/rc.d/rc.local
 
 echo "INSTALL EPEL-RELEASE"
 yum install -y http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
