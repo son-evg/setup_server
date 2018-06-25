@@ -29,10 +29,10 @@ echo "vm.swappiness=0" >>/etc/sysctl.conf
 echo "vm.overcommit_memory=1" >>/etc/sysctl.conf
 sysctl -p
 
-echo "DISABLE IPV6"
-echo "options ipv6 disable=1" >>/etc/modprobe.d/disabled.conf
-echo "NETWORKING_IPV6=no" >>/etc/modprobe.d/disabled.conf
-echo "IPV6INIT=no" >>/etc/modprobe.d/disabled.conf
+#echo "DISABLE IPV6"
+#echo "options ipv6 disable=1" >>/etc/modprobe.d/disabled.conf
+#echo "NETWORKING_IPV6=no" >>/etc/modprobe.d/disabled.conf
+#echo "IPV6INIT=no" >>/etc/modprobe.d/disabled.conf
 
 echo "EDIT LIMITS.CONF"
 echo "* hard core 0" >>/etc/security/limits.conf
