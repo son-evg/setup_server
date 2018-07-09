@@ -12,9 +12,9 @@ echo "DISABLE FIREWALL, POSTFIX"
 systemctl disable firewalld
 systemctl disable postfix
 
-echo "Deny All TCP Wrappers"
-echo "ALL:ALL" >> /etc/hosts.deny
-echo "sshd:ALL" >> /etc/hosts.allow
+#echo "Deny All TCP Wrappers"
+#echo "ALL:ALL" >> /etc/hosts.deny
+#echo "sshd:ALL" >> /etc/hosts.allow
 
 echo "EDIT SYSCTL"
 echo "fs.suid_dumpable = 0" >>/etc/sysctl.conf
