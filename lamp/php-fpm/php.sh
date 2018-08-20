@@ -59,16 +59,16 @@ yum-config-manager --enable remi
 
 if [ "$php_version" = "7.1" ]; then
 	yum-config-manager --enable remi-php71
-	yum -y install nginx php-fpm php-common php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-opcache php-cli php-pecl-zip
+	yum -y install nginx php-fpm php71w-common php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-opcache php-cli php-pecl-zip
 elif [ "$php_version" = "7.0" ]; then
 	yum-config-manager --enable remi-php70
-	yum -y install nginx php-fpm php-common php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-opcache php-cli php-pecl-zip
+	yum -y install nginx php-fpm php70w-common php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-opcache php-cli php-pecl-zip
 elif [ "$php_version" = "5.6" ]; then
 	yum-config-manager --enable remi-php56
-	yum -y install nginx php-fpm php-common php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-opcache php-cli
+	yum -y install nginx php-fpm php56w-common php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-opcache php-cli
 elif [ "$php_version" = "5.5" ]; then
 	yum-config-manager --enable remi-php55
-	yum -y install nginx php-fpm php-common php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-opcache php-cli
+	yum -y install nginx php-fpm php55w-common php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-opcache php-cli
 else
 	yum -y install nginx php-fpm php-common php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-devel php-cli gcc
 fi
