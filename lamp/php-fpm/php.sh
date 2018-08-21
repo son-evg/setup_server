@@ -51,6 +51,13 @@ select opt in "${options[@]}"; do
     
 done
 
+printf "\nNhap vao ten mien or ten thu muc roi an [ENTER]: " 
+read server_name
+if [ "$server_name" = "" ]; then
+	server_name="platfio.com"
+	echo "Ban nhap sai, he thong dung platfio.com lam ten mien chinh"
+fi
+
 # Install EPEL + Remi Repo
 yum -y install epel-release yum-utils
 rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
@@ -60,21 +67,21 @@ yum-config-manager --enable remi
 if [ "$php_version" = "7.1" ]; then
 	yum-config-manager --enable remi-php71
 	yum -y install nginx php-fpm
-	yum -y install nginx php-fpm php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-opcache php-cli php-pecl-zip
+	yum -y install php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-opcache php-cli php-pecl-zip
 elif [ "$php_version" = "7.0" ]; then
 	yum-config-manager --enable remi-php70
 	yum -y install nginx php-fpm
-	yum -y install nginx php-fpm php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-opcache php-cli php-pecl-zip
+	yum -y install php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-opcache php-cli php-pecl-zip
 elif [ "$php_version" = "5.6" ]; then
 	yum-config-manager --enable remi-php56
 	yum -y install nginx php-fpm
-	yum -y install nginx php-fpm php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-opcache php-cli
+	yum -y install php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-opcache php-cli
 elif [ "$php_version" = "5.5" ]; then
 	yum-config-manager --enable remi-php55
 	yum -y install nginx php-fpm
-	yum -y install nginx php-fpm php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-opcache php-cli
+	yum -y install php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-opcache php-cli
 else
-	yum -y install nginx php-fpm php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-devel php-cli gcc
+	yum -y install php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-devel php-cli gcc
 fi
 
 systemctl enable nginx.service
@@ -83,6 +90,7 @@ systemctl enable php-fpm.service
 mkdir -p /var/log/nginx /var/log/php-fpm
 chown -R nginx:nginx /var/log/nginx
 chown -R nginx:nginx /var/lib/php/session
+chown -R nginx:nginx /var/log/php-fpm
 
 phplowmem='2097152'
 check_phplowmem=$(expr $server_ram_total \< $phplowmem)
@@ -197,9 +205,9 @@ opcache.blacklist_filename=/etc/php.d/opcache-default.blacklist
 END
 
 cat > /etc/php.d/opcache-default.blacklist <<END
-/home/*/public_html/wp-content/plugins/backwpup/*
-/home/*/public_html/wp-content/plugins/duplicator/*
-/home/*/public_html/wp-content/plugins/updraftplus/*
+/home/$server_name/public_html/wp-content/plugins/backwpup/*
+/home/$server_name/public_html/wp-content/plugins/duplicator/*
+/home/$server_name/public_html/wp-content/plugins/updraftplus/*
 /home/$server_name/private_html/
 END
 
