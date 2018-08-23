@@ -16,9 +16,9 @@ echo "ALL:ALL" >> /etc/hosts.deny
 echo "sshd:ALL" >> /etc/hosts.allow
 
 echo "EDIT SYSCTL"
-echo "fs.suid_dumpable = 0" >>/etc/sysctl.conf
-echo "fs.suid_dumpable = 0" >>/etc/sysctl.conf
-echo "kernel.exec-shield = 1" >>/etc/sysctl.conf
+#echo "fs.suid_dumpable = 0" >>/etc/sysctl.conf
+#echo "fs.suid_dumpable = 0" >>/etc/sysctl.conf
+#echo "kernel.exec-shield = 1" >>/etc/sysctl.conf
 echo "net.core.somaxconn= 2048" >>/etc/sysctl.conf
 echo "net.ipv6.conf.all.disable_ipv6 = 1" >>/etc/sysctl.conf
 echo "net.ipv6.conf.default.disable_ipv6 = 1" >>/etc/sysctl.conf
