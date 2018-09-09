@@ -1,0 +1,410 @@
+yum install jemalloc -y 
+
+cat > "/etc/yum.repos.d/varnish.repo" <<END
+[varnishcache_varnish41]
+name=varnishcache_varnish41
+baseurl=https://packagecloud.io/varnishcache/varnish41/el/7/\$basearch
+repo_gpgcheck=1
+gpgcheck=0
+enabled=1
+gpgkey=https://packagecloud.io/varnishcache/varnish41/gpgkey
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+metadata_expire=300
+
+[varnishcache_varnish41-source]
+name=varnishcache_varnish41-source
+baseurl=https://packagecloud.io/varnishcache/varnish41/el/7/SRPMS
+repo_gpgcheck=1
+gpgcheck=0
+enabled=1
+gpgkey=https://packagecloud.io/varnishcache/varnish41/gpgkey
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+metadata_expire=300
+END
+
+yum clean all
+yum -q makecache -y --disablerepo='*' --enablerepo='varnishcache_varnish41'
+yum install varnish git automake libtool.x86_64 python-docutils varnish-libs-devel.x86_64 mhash-devel python-docutils -y
+
+cat > "/etc/varnish/varnish.params" <<END
+RELOAD_VCL=1
+VARNISH_VCL_CONF=/etc/varnish/default.vcl
+VARNISH_LISTEN_PORT=80
+VARNISH_ADMIN_LISTEN_ADDRESS=127.0.0.1
+VARNISH_ADMIN_LISTEN_PORT=6082
+VARNISH_SECRET_FILE=/etc/varnish/secret
+VARNISH_STORAGE="malloc,24G"
+VARNISH_USER=varnish
+VARNISH_GROUP=varnish
+DAEMON_OPTS="-p thread_pools=12 -p thread_pool_min=200 -p thread_pool_max=5000 -p thread_pool_timeout=300"
+END
+
+cd /usr/src
+git clone https://github.com/varnish/libvmod-digest.git
+cd libvmod-digest
+./autogen.sh
+./configure
+make -j 4
+make install
+
+yum install geoip geoip-devel -y
+cd /usr/share/GeoIP/
+mv GeoIP.dat GeoIP.dat.old
+wget -O GeoIP.dat.gz http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz
+gunzip GeoIP.dat.gz
+
+cd /usr/src/
+git clone https://github.com/varnish/libvmod-geoip
+cd libvmod-geoip
+./autogen.sh
+./configure
+make
+make install
+
+vi /etc/sysctl.conf
+
+net.ipv4.tcp_mem = 10240 87380 134217728
+net.ipv4.tcp_rmem = 10240 87380 134217728
+net.ipv4.tcp_wmem = 10240 87380 134217728
+net.ipv4.tcp_max_syn_backlog = 204800
+net.ipv4.ip_local_port_range = 20000 65535
+net.ipv4.tcp_fin_timeout = 10
+net.ipv4.tcp_tw_recycle = 1
+net.ipv4.tcp_tw_reuse = 1
+net.ipv4.tcp_max_tw_buckets = 2440000
+net.nf_conntrack_max = 10000000
+net.ipv4.tcp_timestamps = 0
+net.core.rmem_max = 134217728
+net.core.wmem_max = 134217728
+net.core.rmem_default = 16777216
+net.core.wmem_default = 16777216
+net.core.optmem_max = 134217728
+net.ipv4.tcp_moderate_rcvbuf =1
+net.ipv4.tcp_congestion_control=htcp
+net.ipv4.tcp_mtu_probing = 1
+net.ipv4.ip_nonlocal_bind = 1
+net.ipv4.tcp_sack = 1
+net.ipv4.tcp_dsack = 1
+net.core.netdev_budget = 600
+net.ipv4.tcp_low_latency = 1
+net.ipv4.tcp_window_scaling = 1
+net.core.netdev_max_backlog = 300000
+
+sysctl -p
+
+
+vi /usr/lib/systemd/system/varnishncsa.service
+
+[Unit]
+Description=Varnish Cache HTTP accelerator NCSA logging daemon
+After=varnish.service
+
+[Service]
+RuntimeDirectory=varnishncsa
+Type=forking
+PIDFile=/run/varnishncsa/varnishncsa.pid
+User=varnishlog
+Group=varnish
+ExecStart=/usr/bin/varnishncsa -a -F "%%{Host}i %%h %%l %%u %%t \"%%r\" %%s %%b \"%%{Referer}i\" \"%%{User-agent}i\" %%D %%O %%{Varnish:hitmiss}x %%{Varnish:time_firstbyte}x %%{Varnish:handling}x %%{X-USER-IP}i" -w /var/log/varnish/varnishncsa.log -D -P /run/varnishncsa/varnishncsa.pid
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target
+
+
+mkdir -p /var/www/html/errors/
+
+cat > "/var/www/html/errors/503.html" <<END
+<html>
+<head><title>503 Service Unavailable</title></head>
+<body bgcolor="white">
+<center><h1>503 Service Unavailable</h1></center>
+<hr><center>Nginx</center>
+</body>
+</html>
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+END
+
+cat > "/var/www/html/errors/500.html" <<END
+<html>
+<head><title>500 Internal Server Error</title></head>
+<body bgcolor="white">
+<center><h1>500 Internal Server Error</h1></center>
+<hr><center>Nginx</center>
+</body>
+</html>
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+END
+
+cat > "/var/www/html/errors/403.html" <<END
+<html>
+<head><title>403 Forbidden</title></head>
+<body bgcolor="white">
+<center><h1>403 Forbidden</h1></center>
+<hr><center>Nginx</center>
+</body>
+</html>
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+END
+cat > "/var/www/html/errors/429.html" <<END
+<html>
+<head><title>429 TOO MANY REQUESTS</title></head>
+<body bgcolor="white">
+<center><h1>429 TOO MANY REQUESTS</h1></center>
+<hr><center>Nginx</center>
+</body>
+</html>
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+END
+
+cat > "/var/www/html/errors/477.html" <<END
+<html>
+<head><title>477 Suspended CDN resource</title></head>
+<body bgcolor="white">
+<center><h1>477 Suspended CDN resource</h1></center>
+<hr><center>Nginx</center>
+</body>
+</html>
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+<!-- a padding to disable MSIE and Chrome friendly error page -->
+END
+mkdir -p /etc/varnish/conf.d/
+cd /etc/varnish
+echo 'include "/etc/varnish/conf.d/1000.vcl";' > all-vhosts.vcl
+
+vi default.vcl
+
+vcl 4.0;
+import digest;
+import std;
+import directors;
+import geoip;
+#import vsthrottle;
+sub vcl_recv {
+    if (req.http.host == "172.18.10.49") {
+                return (synth(700, "OK"));
+        }
+}
+include "all-vhosts.vcl";
+include "main.vcl";
+
+vi main.vcl
+
+sub vcl_pipe {
+  if (req.http.upgrade) {
+    set bereq.http.upgrade = req.http.upgrade;
+  }
+  return (pipe);
+}
+sub vcl_pass {
+}
+
+sub vcl_hash {
+  hash_data(req.url);
+  if (req.http.host) {
+    hash_data(req.http.host);
+  } else {
+    hash_data(server.ip);
+  }
+  if (req.http.Cookie) {
+    hash_data(req.http.Cookie);
+  }
+}
+
+sub vcl_hit {
+  if (obj.ttl >= 0s) {
+    return (deliver);
+  }
+ return (fetch);
+}
+
+sub vcl_miss {
+    return (fetch);
+}
+sub vcl_backend_response {
+  if (bereq.url ~ "\.m3u8") {
+    set beresp.grace = 5s;
+    set beresp.ttl = 2s;
+    set beresp.http.Cache-Control = "max-age=1";
+  }
+  if (bereq.url ~ "\.ts") {
+    set beresp.grace = 1m;
+    set beresp.ttl = 1m;
+    set beresp.http.Cache-Control = "max-age=60";
+  }
+  if (bereq.url ~ "\.mpd") {
+    set beresp.grace = 5s;
+    set beresp.ttl = 2s;
+    set beresp.http.Cache-Control = "max-age=1";
+  }
+  if (bereq.url ~ "\.m4s") {
+    set beresp.grace = 1m;
+    set beresp.ttl = 1m;
+    set beresp.http.Cache-Control = "max-age=60";
+  }
+  if (beresp.status == 403 || beresp.status == 404 || beresp.status >= 500) {
+    set beresp.ttl = 2s;
+  }
+  set beresp.do_stream = true;
+    return (deliver);
+  }
+sub vcl_backend_error {
+  if (beresp.status == 503 || beresp.status == 502) {
+    set beresp.http.Content-Type = "text/html; charset=utf-8";
+    synthetic(std.fileread("/var/www/html/errors/503.html"));
+    return(deliver);
+  }
+  if (beresp.status == 500) {
+    set beresp.http.Content-Type = "text/html; charset=utf-8";
+    synthetic(std.fileread("/var/www/html/errors/500.html"));
+    return(deliver);
+  }
+  return (deliver);
+}
+sub vcl_deliver {
+  if (obj.hits > 0) {
+    set resp.http.X-Cache = "HIT";
+  }
+  else {
+    set resp.http.X-Cache = "MISS";
+  }
+  if (req.http.CORS == "1") {
+    set resp.http.Access-Control-Allow-Origin = "*";
+  }
+  set resp.http.Server = "nginx";
+  unset resp.http.X-Powered-By;
+  unset resp.http.X-Cache-Hits;
+  unset resp.http.X-Varnish;
+  unset resp.http.Via;
+  unset resp.http.Link;
+  unset resp.http.X-Generator;
+  return (deliver);
+}
+sub vcl_purge {
+  if (req.method != "PURGE") {
+    set req.http.X-Purge = "Yes";
+    return(restart);
+  }
+}
+
+sub vcl_synth {
+  unset resp.http.Server;
+  unset resp.http.X-Varnish;
+  if (resp.status == 403) {
+    synthetic(std.fileread("/var/www/html/errors/403.html"));
+    return(deliver);
+  }
+  if (resp.status == 429) {
+    synthetic(std.fileread("/var/www/html/errors/429.html"));
+    return(deliver);
+  }
+  if (resp.status == 477) {
+    synthetic(std.fileread("/var/www/html/errors/477.html"));
+    return(deliver);
+  }
+  if (resp.status == 700) {
+    set resp.http.Content-Type = "text/html; charset=utf-8";
+    set resp.status = 200;
+    set resp.reason = "OK";
+    synthetic("-777-");
+    return(deliver);
+  }
+  return (deliver);
+}
+
+sub vcl_fini {
+  return (ok);
+}
+
+vi conf.d/1000.vcl
+
+# White list
+# Black list
+# Link secure whitelist
+
+backend u_0_103_216_122_115_1252 {
+  .host = "103_216_122_115";
+  .port = "8080";
+  .connect_timeout = 5s;
+  .first_byte_timeout = 5s;
+  .between_bytes_timeout  = 5s;
+}
+
+# Round Robin
+# Failover
+# IP HASH
+
+sub vcl_recv {
+  if (req.http.host == "51.15.7.22") {
+    set req.backend_hint = u_0_103_216_122_115_1252;
+    set req.http.Host = "103_216_122_115";
+    # Secure Method
+    if (req.method != "PURGE" && req.method != "GET" && req.method != "HEAD" && req.method != "OPTIONS") {
+      return (synth(403, "Forbidden"));
+    }
+    # Secure Referer
+    #if (req.http.referer !~ "^http(|s)://speedtv.live" && req.http.referer !~ "^http(|s)://facebook.com") {
+    #  return (synth(403, "Forbidden"));
+    #}
+    # User Agent
+    if (req.http.X-USER-IP) {
+      set req.http.X-Client-IP = req.http.X-USER-IP;
+    } else {
+      set req.http.X-Client-IP = client.ip;
+    }
+    # Rate Limit
+    # CORS
+    set req.http.CORS = "1";
+    # GeoIP Black List
+    # Black List
+    # White List
+    # HLS 
+    # Secure Link
+    # Not Secure Link
+    if (req.url ~ "\.m3u8") {
+      unset req.http.Cookie;
+      return (hash);
+    }
+    if (req.url ~ "\.ts") {
+      set req.url = regsub(req.url, "^(.*)\?hotkey=([a-zA-Z0-9]+)&time=([0-9]+)(.*)", "\1");
+      unset req.http.Cookie;
+      return (hash);
+    }
+    # MPEG DASH
+    if (req.url ~ "\.mpd") {
+      unset req.http.Cookie;
+      return (pass);
+    }
+    if (req.url ~ "\.m4s") {
+      unset req.http.Cookie;
+      return (hash);
+    }
+    return (pass);
+  }
+}
