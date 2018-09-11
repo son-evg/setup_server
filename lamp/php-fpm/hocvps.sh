@@ -360,7 +360,7 @@ cat > "/usr/share/nginx/html/403.html" <<END
 <head><title>403 Forbidden</title></head>
 <body bgcolor="white">
 <center><h1>403 Forbidden</h1></center>
-<hr><center>hocvps-nginx</center>
+<hr><center>Nginx</center>
 </body>
 </html>
 <!-- a padding to disable MSIE and Chrome friendly error page -->
@@ -376,7 +376,7 @@ cat > "/usr/share/nginx/html/404.html" <<END
 <head><title>404 Not Found</title></head>
 <body bgcolor="white">
 <center><h1>404 Not Found</h1></center>
-<hr><center>hocvps-nginx</center>
+<hr><center>Nginx</center>
 </body>
 </html>
 <!-- a padding to disable MSIE and Chrome friendly error page -->
