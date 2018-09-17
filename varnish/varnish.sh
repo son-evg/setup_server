@@ -1,8 +1,8 @@
 #!/bin/bash
 #######################################################
-yum install jemalloc
+yum install jemalloc -y
 wget https://raw.githubusercontent.com/keta124/setup_server/master/varnish/varnish.repo -O /etc/yum.repos.d/varnish.repo
-yum install varnish git automake libtool.x86_64 python-docutils varnish-libs-devel.x86_64 mhash-devel –y
+yum install varnish git automake libtool.x86_64 python-docutils varnish-libs-devel.x86_64 mhash-devel -y
 printf "Load varnish.params  \n"
 wget https://raw.githubusercontent.com/keta124/setup_server/master/varnish/varnish.params -O /etc/varnish/varnish.params
 
