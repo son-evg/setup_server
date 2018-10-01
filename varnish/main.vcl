@@ -91,6 +91,7 @@ sub vcl_deliver {
   unset resp.http.X-Generator;
   unset resp.http.ETag;
   unset resp.http.CF-RAY;
+  unset resp.http.Set-Cookie;
   return (deliver);
 }
 sub vcl_purge {
