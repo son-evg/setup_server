@@ -76,8 +76,11 @@ sub vcl_deliver {
   else {
     set resp.http.X-Cache = "MISS";
   }
-  if (req.http.CORS == "1") {
-    set resp.http.Access-Control-Allow-Origin = "http://gogotv.live";
+  if (req.http.CORS) {
+    set resp.http.Access-Control-Allow-Origin = req.http.CORS;
+  }
+  else {
+    set resp.http.Access-Control-Allow-Origin = "*";
   }
   set resp.http.Server = "nginx";
   unset resp.http.X-Powered-By;
