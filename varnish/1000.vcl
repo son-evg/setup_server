@@ -16,7 +16,7 @@ backend u_1000 {
 
 sub vcl_recv {
     if (req.http.host == "cdnlive.xxxxxxxx.live") {
-        set req.backend_hint = u_1000_1252;
+        set req.backend_hint = u_1000;
         set req.http.Host = "172.17.10.40";
         unset req.http.CF-RAY;
         unset req.http.CF-Connecting-IP;
