@@ -2,7 +2,7 @@
 # Black list
 # Link secure whitelist
 
-backend u_1000_1252 {
+backend u_1000 {
    .host = "172.18.10.40";
    .port = "8080";
    .connect_timeout = 5s;
@@ -18,6 +18,9 @@ sub vcl_recv {
     if (req.http.host == "cdnlive.xxxxxxxx.live") {
         set req.backend_hint = u_1000_1252;
         set req.http.Host = "172.17.10.40";
+        unset req.http.CF-RAY;
+        set req.http.CF-IP = req.http.CF-Connecting-IP;
+        unset req.http.CF-Connecting-IP;
         # Secure Method
         if (req.method != "PURGE" && req.method != "GET" && req.method != "HEAD" && req.method != "OPTIONS") {
             return (synth(403, "Forbidden"));
