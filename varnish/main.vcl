@@ -91,9 +91,6 @@ sub vcl_deliver {
   unset resp.http.X-Generator;
   unset resp.http.ETag;
   unset resp.http.CF-RAY;
-  if (req.http.CF-IP){
-    set resp.http.CF-Connecting-IP = req.http.CF-IP;
-  }
   return (deliver);
 }
 sub vcl_purge {
