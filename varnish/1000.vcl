@@ -19,7 +19,6 @@ sub vcl_recv {
         set req.backend_hint = u_1000_1252;
         set req.http.Host = "172.17.10.40";
         unset req.http.CF-RAY;
-        set req.http.CF-IP = req.http.CF-Connecting-IP;
         unset req.http.CF-Connecting-IP;
         # Secure Method
         if (req.method != "PURGE" && req.method != "GET" && req.method != "HEAD" && req.method != "OPTIONS") {
