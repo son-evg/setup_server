@@ -26,7 +26,7 @@ sub vcl_recv {
             return (synth(403, "Forbidden"));
         }
         # Secure Referer
-        #if (req.http.referer !~ "^http(|s)://xxxxxxxx.live" && req.http.referer !~ "^http(|s)://facebook.com") {
+        #if (req.http.referer !~ "^http(|s)://gogotv.live" && req.http.referer !~ "^http(|s)://facebook.com") {
         #    return (synth(403, "Forbidden"));
         #}
         # User Agent
@@ -37,7 +37,7 @@ sub vcl_recv {
         }
         # Rate Limit
         # CORS
-        set req.http.CORS = "1";
+        set req.http.CORS = "http://gogotv.live";
         # GeoIP Black List
         # Black List
         # White List
