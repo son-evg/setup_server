@@ -1,0 +1,35 @@
+1. Limit lftp
+vi /etc/lftp.conf
+	set net:limit-total-rate 52428800:52428800
+	set net:connection-limit 40
+2. Dùng cgroup limit
+
+$ yum install libcgroup
+$ service cgconfig start
++ Kiểm tra
+$ sudo lscgroup
++ Config
+$ vi /etc/cgconfig.conf
+Add them dong limit cpu ( 2000 tuong ung 2000% => 20 core)
+
+group limitcpu{
+        cpu {
+                cpu.shares = 2000;
+        }
+}
++ Restart service cgroup
+$ service cgconfig restart
+$ chkconfig cgconfig on
+
+Kiểm tra
+$ lscgroup   => cpu:/limitcpu
+
++ add service hoặc user vào group limit
+
+$ vi /etc/cgrules.conf
+
+scorecard:lftp        cpu     limitcpu/
+
++ Start service daemon
+$ service cgred start
+$ chkconfig cgred on
