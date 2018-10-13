@@ -224,7 +224,7 @@ END
 
 wget https://raw.githubusercontent.com/keta124/setup_server/master/varnish/varnishncsa.service -O /usr/lib/systemd/system/varnishncsa.service
 
-systemctl deamon-reload
+systemctl daemon-reload
 systemctl enable varnish
 
 printf "Config Varnish \n"
