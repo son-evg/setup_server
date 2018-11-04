@@ -71,7 +71,7 @@ fi" >>/etc/rc.d/rc.local
 
 echo "INSTALL EPEL-RELEASE"
 yum install epel-release -y
-yum install  iptables-services net-tools htop glances tuned chrony wget bind-utils -y
+yum install  iptables-services net-tools htop glances tuned chrony wget bind-utils iftop python2-pip -y
 yum groupinstall "Development Tools" -y
 
 echo "INSTALL Rsyslog"
