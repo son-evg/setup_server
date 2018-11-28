@@ -44,11 +44,11 @@ echo "root hard nproc unlimited" >>/etc/security/limits.conf
 echo "root - memlock unlimited" >>/etc/security/limits.conf
 
 echo "ENABLE HUGEPAGE"
-echo "if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
+echo "if [ -d /sys/kernel/mm/transparent_hugepage ]; then
 echo never > /sys/kernel/mm/transparent_hugepage/enabled
 fi" >> /etc/rc.d/rc.local
 
-echo "if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
+echo "if [ -d /sys/kernel/mm/transparent_hugepage/defrag]; then
 echo never > /sys/kernel/mm/transparent_hugepage/defrag
 fi" >>/etc/rc.d/rc.local
 
