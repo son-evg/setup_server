@@ -48,7 +48,7 @@ echo "if [ -d /sys/kernel/mm/transparent_hugepage ]; then
 echo never > /sys/kernel/mm/transparent_hugepage/enabled
 fi" >> /etc/rc.d/rc.local
 
-echo "if [ -d /sys/kernel/mm/transparent_hugepage/defrag]; then
+echo "if [ -d /sys/kernel/mm/transparent_hugepage/defrag ]; then
 echo never > /sys/kernel/mm/transparent_hugepage/defrag
 fi" >>/etc/rc.d/rc.local
 
