@@ -11,6 +11,7 @@ chmod 700 /root
 echo "DISABLE FIREWALL, POSTFIX"
 systemctl disable firewalld
 systemctl disable postfix
+systemctl disable chrony
 
 echo "EDIT SYSCTL"
 echo "fs.file-max = 4587520" >>/etc/sysctl.conf
@@ -53,7 +54,7 @@ fi" >>/etc/rc.d/rc.local
 
 echo "INSTALL EPEL-RELEASE"
 yum install epel-release -y
-yum install  iptables-services net-tools htop glances tuned ntpd nscd wget -y
+yum install  iptables-services net-tools htop glances tuned ntp nscd wget -y
 yum groupinstall "Development Tools" -y
 
 echo "INSTALL Rsyslog"
