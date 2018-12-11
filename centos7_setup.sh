@@ -23,14 +23,21 @@ echo "net.ipv6.conf.all.disable_ipv6 = 1" >>/etc/sysctl.conf
 echo "net.ipv6.conf.default.disable_ipv6 = 1" >>/etc/sysctl.conf
 echo "net.ipv6.conf.lo.disable_ipv6 = 1" >>/etc/sysctl.conf
 echo "net.ipv4.tcp_syncookies = 1" >>/etc/sysctl.conf
-echo "vm.swappiness=0" >>/etc/sysctl.conf
+echo "vm.swappiness=1" >>/etc/sysctl.conf
 echo "vm.overcommit_memory=1" >>/etc/sysctl.conf
+echo "net.ipv4.tcp_timestamps=0" >>/etc/sysctl.conf
+echo "net.ipv4.tcp_sack=1" >>/etc/sysctl.conf
+echo "net.core.netdev_max_backlog=250000" >>/etc/sysctl.conf
+echo "net.core.rmem_max=4194304" >>/etc/sysctl.conf
+echo "net.core.wmem_max=4194304" >>/etc/sysctl.conf
+echo "net.core.rmem_default=4194304" >>/etc/sysctl.conf
+echo "net.core_wmem_default=4194304" >>/etc/sysctl.conf
+echo "net.core.optmem_max=4194304" >>/etc/sysctl.conf
+echo "net.ipv4.tcp_rmem="4096 87380 4194304"" >>/etc/sysctl.conf
+echo "net.ipv4.tcp_wmem="4096 65536 4194304"" >>/etc/sysctl.conf
+echo "net.ipv4.tcp_low_latency=1" >>/etc/sysctl.conf
+echo "net.ipv4.tcp_adv_win_scale=1" >>/etc/sysctl.conf
 sysctl -p
-
-#echo "DISABLE IPV6"
-#echo "options ipv6 disable=1" >>/etc/modprobe.d/disabled.conf
-#echo "NETWORKING_IPV6=no" >>/etc/modprobe.d/disabled.conf
-#echo "IPV6INIT=no" >>/etc/modprobe.d/disabled.conf
 
 echo "EDIT LIMITS.CONF"
 echo "* hard core 0" >>/etc/security/limits.conf
@@ -51,7 +58,7 @@ fi" >>/etc/rc.d/rc.local
 
 echo "INSTALL EPEL-RELEASE"
 yum install epel-release -y
-yum install  iptables-services net-tools htop glances tuned chrony wget -y
+yum install  iptables-services net-tools htop glances chrony wget -y
 yum groupinstall "Development Tools" -y
 
 echo "INSTALL Rsyslog"
