@@ -70,7 +70,8 @@ systemctl start rsyslog.service
 echo "SET TIMEZONE"
 timedatectl set-timezone Asia/Ho_Chi_Minh
 
-systemctl enable iptables chronyd crond tuned
+systemctl enable iptables chronyd crond
+systemctl disable tuned
 systemctl start chronyd
 chronyc tracking
 
