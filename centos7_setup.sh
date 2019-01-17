@@ -8,74 +8,56 @@ echo "Securing root Logins"
 echo "tty1" > /etc/securetty
 chmod 700 /root
 
+echo "INSTALL EPEL-RELEASE"
+yum install epel-release -y
+yum install iptables-services net-tools htop glances chrony wget nscd rsyslog -y
+yum groupinstall "Development Tools" -y
+
+echo "ENABLE CHRONY"
+systemctl enable iptables chronyd crond
+systemctl start chronyd
+chronyc tracking
+
 echo "DISABLE FIREWALL, POSTFIX"
 systemctl disable firewalld
 systemctl disable postfix
 
-#echo "Deny All TCP Wrappers"
-#echo "ALL:ALL" >> /etc/hosts.deny
-#echo "sshd:ALL" >> /etc/hosts.allow
+echo "DISABLE TUNED"
+systemctl start tuned
+tuned-adm off
+systemctl stop tuned
+systemctl disable tuned
 
-echo "EDIT SYSCTL"
-echo "fs.file-max = 4587520" >>/etc/sysctl.conf
-echo "net.core.somaxconn= 2048" >>/etc/sysctl.conf
-echo "net.ipv6.conf.all.disable_ipv6 = 1" >>/etc/sysctl.conf
-echo "net.ipv6.conf.default.disable_ipv6 = 1" >>/etc/sysctl.conf
-echo "net.ipv6.conf.lo.disable_ipv6 = 1" >>/etc/sysctl.conf
-echo "net.ipv4.tcp_syncookies = 1" >>/etc/sysctl.conf
-echo "vm.swappiness=1" >>/etc/sysctl.conf
-echo "vm.overcommit_memory=1" >>/etc/sysctl.conf
-echo "net.ipv4.tcp_timestamps=0" >>/etc/sysctl.conf
-echo "net.ipv4.tcp_sack=1" >>/etc/sysctl.conf
-echo "net.core.netdev_max_backlog=250000" >>/etc/sysctl.conf
-echo "net.core.rmem_max=4194304" >>/etc/sysctl.conf
-echo "net.core.wmem_max=4194304" >>/etc/sysctl.conf
-echo "net.core.rmem_default=4194304" >>/etc/sysctl.conf
-#echo "net.core_wmem_default=4194304" >>/etc/sysctl.conf
-echo "net.core.optmem_max=4194304" >>/etc/sysctl.conf
-echo "net.ipv4.tcp_rmem="4096 87380 4194304"" >>/etc/sysctl.conf
-echo "net.ipv4.tcp_wmem="4096 65536 4194304"" >>/etc/sysctl.conf
-echo "net.ipv4.tcp_low_latency=1" >>/etc/sysctl.conf
-echo "net.ipv4.tcp_adv_win_scale=1" >>/etc/sysctl.conf
-#echo "net.ipv4.netfilter.ip_conntrack_max = 196608" >> /etc/sysctl.conf
-sysctl -p
-
-echo "EDIT LIMITS.CONF"
-echo "* hard core 0" >>/etc/security/limits.conf
-echo "root soft nofile 32768" >>/etc/security/limits.conf
-echo "root soft nproc 65536" >>/etc/security/limits.conf
-echo "root hard nofile 1048576" >>/etc/security/limits.conf
-echo "root hard nproc unlimited" >>/etc/security/limits.conf
-echo "root - memlock unlimited" >>/etc/security/limits.conf
-
-echo "ENABLE HUGEPAGE"
-echo "if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
-echo never > /sys/kernel/mm/transparent_hugepage/enabled
-fi" >> /etc/rc.d/rc.local
-
-echo "if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
-echo never > /sys/kernel/mm/transparent_hugepage/defrag
-fi" >>/etc/rc.d/rc.local
-
-chmod +x /etc/rc.d/rc.local
-
-echo "INSTALL EPEL-RELEASE"
-yum install epel-release -y
-yum install  iptables-services net-tools htop glances chrony wget -y
-yum groupinstall "Development Tools" -y
+echo "Start Name Service Caching"
+systemctl start nscd.service
+systemctl enable nscd.service
 
 echo "INSTALL Rsyslog"
-yum -y install rsyslog
 systemctl enable rsyslog.service
 systemctl start rsyslog.service
 
+echo "EDIT SYSCTL"
+echo "vm.swappiness=1" >>/etc/sysctl.conf
+echo "net.ipv6.conf.all.disable_ipv6 = 1" >>/etc/sysctl.conf
+echo "net.ipv6.conf.default.disable_ipv6 = 1" >>/etc/sysctl.conf
+echo "net.core.somaxconn= 1024" >>/etc/sysctl.conf
+echo "fs.file-max = 6544018" >>/etc/sysctl.conf
+sysctl -p
+
+echo "EDIT LIMITS.CONF"
+echo "* soft nofile 32768" >>/etc/security/limits.conf
+echo "* soft nproc 65536" >>/etc/security/limits.conf
+echo "* hard nofile 1048576" >>/etc/security/limits.conf
+echo "* hard nproc unlimited" >>/etc/security/limits.conf
+echo "root - memlock unlimited" >>/etc/security/limits.conf
+
+echo "ENABLE HUGEPAGE"
+echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /etc/rc.d/rc.local
+echo "echo never > /sys/kernel/mm/transparent_hugepage/defrag" >>/etc/rc.d/rc.local
+chmod +x /etc/rc.d/rc.local
+
 echo "SET TIMEZONE"
 timedatectl set-timezone Asia/Ho_Chi_Minh
-
-systemctl enable iptables chronyd crond
-systemctl disable tuned
-systemctl start chronyd
-chronyc tracking
 
 echo "Update kernel"
 yum update kernel -y
