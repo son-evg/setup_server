@@ -45,7 +45,7 @@ echo "fs.file-max = 6544018" >>/etc/sysctl.conf
 sysctl -p
 
 echo "EDIT LIMITS.CONF"
-echo "* soft nofile 32768" >>/etc/security/limits.conf
+echo "* soft nofile 65536" >>/etc/security/limits.conf
 echo "* soft nproc 65536" >>/etc/security/limits.conf
 echo "* hard nofile 1048576" >>/etc/security/limits.conf
 echo "* hard nproc unlimited" >>/etc/security/limits.conf
