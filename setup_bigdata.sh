@@ -51,10 +51,10 @@ fi" >> /etc/rc.d/rc.local
 echo "if [ -d /sys/kernel/mm/transparent_hugepage/defrag ]; then
 echo never > /sys/kernel/mm/transparent_hugepage/defrag
 fi" >>/etc/rc.d/rc.local
-
+chmod +x /etc/rc.d/rc.local
 echo "INSTALL EPEL-RELEASE"
 yum install epel-release -y
-yum install  iptables-services net-tools htop glances tuned ntp nscd wget -y
+yum install  iptables-services net-tools htop glances curl wget ntp nscd wget -y
 yum groupinstall "Development Tools" -y
 
 echo "INSTALL Rsyslog"
