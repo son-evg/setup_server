@@ -113,7 +113,7 @@ sleep 3
 yum-config-manager --enable remi
 
 if [ "$php_version" = "7.1" ]; then
-	yum-config-manager --enable remi-php71
+	yum-config-manager --enable remi-php72
 	yum -y install nginx php-fpm php-common php-gd php-mysqlnd php-pdo php-xml php-mbstring php-mcrypt php-curl php-opcache php-cli php-pecl-zip
 elif [ "$php_version" = "7.0" ]; then
 	yum-config-manager --enable remi-php70
