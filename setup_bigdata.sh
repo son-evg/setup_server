@@ -36,6 +36,10 @@ echo "net.ipv4.tcp_adv_win_scale=1" >>/etc/sysctl.conf
 sysctl -p
 
 echo "EDIT LIMITS.CONF"
+echo "* soft nofile 65536" >>/etc/security/limits.conf
+echo "* soft nproc 65536" >>/etc/security/limits.conf
+echo "* hard nofile 1048576" >>/etc/security/limits.conf
+echo "* hard nproc unlimited" >>/etc/security/limits.conf
 echo "* hard core 0" >>/etc/security/limits.conf
 echo "root soft nofile 32768" >>/etc/security/limits.conf
 echo "root soft nproc 65536" >>/etc/security/limits.conf
@@ -44,14 +48,10 @@ echo "root hard nproc unlimited" >>/etc/security/limits.conf
 echo "root - memlock unlimited" >>/etc/security/limits.conf
 
 echo "ENABLE HUGEPAGE"
-echo "if [ -f /sys/kernel/mm/transparent_hugepage ]; then
-echo never > /sys/kernel/mm/transparent_hugepage/enabled
-fi" >> /etc/rc.d/rc.local
-
-echo "if [ -f /sys/kernel/mm/transparent_hugepage/defrag ]; then
-echo never > /sys/kernel/mm/transparent_hugepage/defrag
-fi" >>/etc/rc.d/rc.local
+echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /etc/rc.d/rc.local
+echo "echo never > /sys/kernel/mm/transparent_hugepage/defrag" >>/etc/rc.d/rc.local
 chmod +x /etc/rc.d/rc.local
+
 echo "INSTALL EPEL-RELEASE"
 yum install epel-release -y
 yum install  iptables-services net-tools htop glances curl wget ntp nscd wget -y
