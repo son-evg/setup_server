@@ -10,7 +10,7 @@ echo "tty1" > /etc/securetty
 chmod 700 /root
 
 apt-get update
-
+apt-get install iptables iptables-persistent net-tools htop glances curl ntp wget telnet -y
 echo "EDIT SYSCTL"
 echo "fs.file-max = 4587520" >>/etc/sysctl.conf
 echo "net.core.somaxconn= 2048" >>/etc/sysctl.conf
@@ -33,6 +33,10 @@ echo "net.ipv4.tcp_adv_win_scale=1" >>/etc/sysctl.conf
 sysctl -p
 
 echo "EDIT LIMITS.CONF"
+echo "* soft nofile 65536" >>/etc/security/limits.conf
+echo "* soft nproc 65536" >>/etc/security/limits.conf
+echo "* hard nofile 1048576" >>/etc/security/limits.conf
+echo "* hard nproc unlimited" >>/etc/security/limits.conf
 echo "* hard core 0" >>/etc/security/limits.conf
 echo "root soft nofile 32768" >>/etc/security/limits.conf
 echo "root soft nproc 65536" >>/etc/security/limits.conf
@@ -40,16 +44,23 @@ echo "root hard nofile 1048576" >>/etc/security/limits.conf
 echo "root hard nproc unlimited" >>/etc/security/limits.conf
 echo "root - memlock unlimited" >>/etc/security/limits.conf
 
-apt-get install iptables iptables-persistent net-tools htop glances ntp wget -y
 systemctl enable rsyslog.service
 systemctl start rsyslog.service
 echo "SET TIMEZONE"
 timedatectl set-timezone Asia/Ho_Chi_Minh
-systemctl enable iptables crond ntpd
-
-#echo "EDIT SELINUX"
-#sed -i -e 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
-
+systemctl enable netfilter-persistent cron ntp
+#iptables
+iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p icmp -j ACCEPT
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+iptables -A INPUT -j REJECT --reject-with icmp-host-prohibited
+iptables -A FORWARD -j REJECT --reject-with icmp-host-prohibited
+netfilter-persistent save
+netfilter-persistent reload
+#ntp
+sed -i -e 's/pool 0.ubuntu.pool.ntp.org iburst/server time.google.com iburst/g' /etc/ntp.conf
+systemctl restart ntp
 #cmdlog
 echo "export PROMPT_COMMAND='RETRN_VAL=$?;logger -p local6.debug \"[\$(echo \$SSH_CLIENT | cut -d\" \" -f1)] # \$(history 1 | sed \"s/^[ ]*[0-9]\+[ ]*//\" )\"'" >>/etc/bash.bashrc
 echo "local6.debug                /var/log/cmdlog.log" >> /etc/rsyslog.conf
@@ -66,5 +77,3 @@ echo "/var/log/cmdlog.log {
   /bin/kill -HUP \`cat /var/run/syslogd.pid 2> /dev/null\` 2> /dev/null || true
   endscript
 }" >>/etc/logrotate.d/cmdlog
-netfilter-persistent reload
-systemctl enable netfilter-persistent
