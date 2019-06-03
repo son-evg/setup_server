@@ -10,6 +10,7 @@ echo "tty1" > /etc/securetty
 chmod 700 /root
 
 apt-get update
+apt-get dist-upgrade
 apt-get install iptables iptables-persistent net-tools htop glances curl ntp wget telnet -y
 echo "EDIT SYSCTL"
 echo "fs.file-max = 4587520" >>/etc/sysctl.conf
