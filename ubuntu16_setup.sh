@@ -45,11 +45,18 @@ echo "root hard nofile 1048576" >>/etc/security/limits.conf
 echo "root hard nproc unlimited" >>/etc/security/limits.conf
 echo "root - memlock unlimited" >>/etc/security/limits.conf
 
+echo "ENABLE HUGEPAGE"
+sed -i -e 's/exit 0//g' /etc/rc.local
+echo "echo never > /sys/kernel/mm/transparent_hugepage/enabled" >> /etc/rc.local
+echo "echo never > /sys/kernel/mm/transparent_hugepage/defrag" >>/etc/rc.local
+echo "exit 0" >>/etc/rc.local
+chmod +x /etc/rc.local
+
 systemctl enable rsyslog.service
 systemctl start rsyslog.service
 echo "SET TIMEZONE"
 timedatectl set-timezone Asia/Ho_Chi_Minh
-systemctl enable netfilter-persistent cron ntp
+systemctl enable netfilter-persistent cron
 #iptables
 iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 iptables -A INPUT -p icmp -j ACCEPT
@@ -61,7 +68,8 @@ netfilter-persistent save
 netfilter-persistent reload
 #ntp
 sed -i -e 's/pool 0.ubuntu.pool.ntp.org iburst/server time.google.com iburst/g' /etc/ntp.conf
-systemctl restart ntp
+systemctl start ntp
+systemctl enable ntp
 #cmdlog
 echo "export PROMPT_COMMAND='RETRN_VAL=$?;logger -p local6.debug \"[\$(echo \$SSH_CLIENT | cut -d\" \" -f1)] # \$(history 1 | sed \"s/^[ ]*[0-9]\+[ ]*//\" )\"'" >>/etc/bash.bashrc
 echo "local6.debug                /var/log/cmdlog.log" >> /etc/rsyslog.conf
