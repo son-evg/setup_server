@@ -8,7 +8,7 @@ chmod 644 ~/.ssh/authorized_keys
 echo "Securing root Logins"
 echo "tty1" > /etc/securetty
 chmod 700 /root
-
+echo umask 0022 >> /etc/profile
 apt-get update
 #apt-get dist-upgrade -y
 apt-get install iptables iptables-persistent net-tools htop glances curl ntp wget telnet -y
@@ -57,6 +57,7 @@ systemctl start rsyslog.service
 echo "SET TIMEZONE"
 timedatectl set-timezone Asia/Ho_Chi_Minh
 systemctl enable netfilter-persistent cron
+ufw disable
 #iptables
 iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 iptables -A INPUT -p icmp -j ACCEPT
