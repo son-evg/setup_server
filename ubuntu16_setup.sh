@@ -10,7 +10,7 @@ echo "tty1" > /etc/securetty
 chmod 700 /root
 
 apt-get update
-apt-get dist-upgrade
+#apt-get dist-upgrade -y
 apt-get install iptables iptables-persistent net-tools htop glances curl ntp wget telnet -y
 echo "EDIT SYSCTL"
 echo "fs.file-max = 4587520" >>/etc/sysctl.conf
@@ -39,10 +39,10 @@ echo "* soft nproc 65536" >>/etc/security/limits.conf
 echo "* hard nofile 1048576" >>/etc/security/limits.conf
 echo "* hard nproc unlimited" >>/etc/security/limits.conf
 echo "* hard core 0" >>/etc/security/limits.conf
-echo "root soft nofile 32768" >>/etc/security/limits.conf
-echo "root soft nproc 65536" >>/etc/security/limits.conf
-echo "root hard nofile 1048576" >>/etc/security/limits.conf
-echo "root hard nproc unlimited" >>/etc/security/limits.conf
+#echo "root soft nofile 65536" >>/etc/security/limits.conf
+#echo "root soft nproc 65536" >>/etc/security/limits.conf
+#echo "root hard nofile 1048576" >>/etc/security/limits.conf
+#echo "root hard nproc unlimited" >>/etc/security/limits.conf
 echo "root - memlock unlimited" >>/etc/security/limits.conf
 
 echo "ENABLE HUGEPAGE"
